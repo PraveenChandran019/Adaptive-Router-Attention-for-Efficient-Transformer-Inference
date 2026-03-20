@@ -3,17 +3,7 @@
 Problem Statement
 
 Transformer models rely on full self-attention, which has:
-
-𝑂
-(
-𝑛
-2
-⋅
-𝑑
-)
-O(n
-2
-⋅d)
+                     O(n2⋅d)
 
 time and memory complexity.
 
@@ -47,307 +37,101 @@ We introduce a token-wise routing mechanism that dynamically decides:
 
 Key Idea
 
-For each token 
-𝑥
-𝑖
-x
-i
-	​
-
-, compute a routing weight:
-
-𝑔
-𝑖
-∈
-[
-0
-,
-1
-]
-g
-i
-	​
-
-∈[0,1]
+For each token xi​ , compute a routing weight:
+                gi​∈[0,1]
 
 Then combine two attention paths:
 
-Output
-𝑖
-=
-𝑔
-𝑖
-⋅
-FullAttention
-𝑖
-+
-(
-1
-−
-𝑔
-𝑖
-)
-⋅
-LocalAttention
-𝑖
-Output
-i
-	​
-
-=g
-i
-	​
-
-⋅FullAttention
-i
-	​
-
-+(1−g
-i
-	​
-
-)⋅LocalAttention
-i
-	​
+Outputi​=gi​⋅FullAttentioni​+(1−gi​)⋅LocalAttentioni
 
 Mathematical Formulation
 1. Standard Attention
-Attn
-(
-𝑄
-,
-𝐾
-,
-𝑉
-)
-=
-Softmax
-(
-𝑄
-𝐾
-𝑇
-𝑑
-)
-𝑉
-Attn(Q,K,V)=Softmax(
-d
-	​
-
-QK
-T
-	​
-
-)V
+Attn(Q,K,V)=Softmax(​QKT/​√d)V
 
 Complexity:
-
-𝑂
-(
-𝑛
-2
-𝑑
-)
-O(n
-2
-d)
+   O(n**2 d)
 2. Local Attention (Cheap Path)
 
 Restrict attention to a window of size 
-𝑤
-w:
-
-LocalAttn
-(
-𝑥
-𝑖
-)
-=
-∑
-𝑗
-∈
-𝑁
-(
-𝑖
-)
-𝛼
-𝑖
-𝑗
-𝑉
-𝑗
-LocalAttn(x
-i
-	​
-
-)=
-j∈N(i)
-∑
-	​
-
-α
-ij
-	​
-
-V
-j
-	​
-
-
+  LocalAttn(xi​)= ∑ j∈N(i) ​αij​Vj​
 Complexity:
-
-𝑂
-(
-𝑛
-⋅
-𝑤
-⋅
-𝑑
-)
-O(n⋅w⋅d)
+   O(n⋅w⋅d)
+   
 3. Router Function
 
 We compute routing scores using token statistics:
 
 Magnitude:
-
-∥
-𝑥
-𝑖
-∥
-∥x
-i
-	​
-
-∥
+   ∥xi​∥
 
 Variance:
-
-Var
-(
-𝑥
-𝑖
-)
-Var(x
-i
-	​
-
-)
-
+  Var(xi​)
+  
 Context deviation:
 
-∥
-𝑥
-𝑖
-−
-𝜇
-∥
-,
-𝜇
-=
-1
-𝑛
-∑
-𝑥
-𝑖
-∥x
-i
-	​
-
-−μ∥,μ=
-n
-1
-	​
-
-∑x
-i
-	​
-
+∥xi​−μ∥, μ=n1​∑xi​	​
 
 Router:
 
-𝑔
-𝑖
-=
-𝜎
-(
-MLP
-(
-[
-∥
-𝑥
-𝑖
-∥
-,
-Var
-(
-𝑥
-𝑖
-)
-,
-∥
-𝑥
-𝑖
-−
-𝜇
-∥
-]
-)
-)
-g
-i
-	​
+gi​=σ(MLP([∥xi​∥,Var(xi​),∥xi​−μ∥]))]
 
-=σ(MLP([∥x
-i
-	​
-
-∥,Var(x
-i
-	​
-
-),∥x
-i
-	​
-
-−μ∥]))
 4. Final Output
-𝑦
-𝑖
-=
-𝑔
-𝑖
-⋅
-𝑦
-𝑖
-full
-+
-(
-1
-−
-𝑔
-𝑖
-)
-⋅
-𝑦
-𝑖
-local
-y
-i
-	​
+   yi​=gi​⋅yifull​+(1−gi​)⋅yilocal​
 
-=g
-i
-	​
+Empirical Results
 
-⋅y
-i
-full
-	​
+Training Metrics
 
-+(1−g
-i
-	​
+Performance Improvements
 
-)⋅y
-i
-local
-	​
+1. Inference Latency
+
+   Latency Reduction= 7.27−4.11 / 7.27 ≈ 43.5%
+   
+2. FLOPs Reduction (Scaling Perspective)
+
+At sequence length 512:
+
+Full Attention: 1.07b FLOPs
+
+Cheap Path: 21M FLOPs
+
+Reduction ≈ 68.0 %
+
+3. Scaling Behavior
+
+
+Key Insights
+
+Router avoids unnecessary global attention
+
+Gains increase with sequence length
+
+Acts like a learned sparsity mechanism
+
+Trades small accuracy drop for large efficiency gains
+
+
+Interpretation
+
+The router effectively learns:
+
+High-importance tokens → Full attention
+
+Low-importance tokens → Local attention
+
+This mimics:
+
+Sparse attention
+
+Mixture-of-experts routing
+
+Conditional computation
+
+Limitations
+
+Slight degradation in accuracy (~26% relative drop)
+
+Training cost increases (~49% FLOPs increase)
+
+Router quality is critical
