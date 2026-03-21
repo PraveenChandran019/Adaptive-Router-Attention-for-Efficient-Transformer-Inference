@@ -1,38 +1,78 @@
 # Adaptive-Router-Attention-for-Efficient-Transformer-Inference
 
-## Problem Statement
+## Introduction
 
-Transformer models rely on full self-attention, which has: O(n2⋅d) time and memory complexity.
+The Adaptive Router Attention (ARA) framework is a novel approach designed to improve the efficiency of transformer inference by reducing unnecessary global attention computations. Traditional transformer models rely on full self-attention, which scales quadratically with sequence length, making them inefficient for long-context tasks.
 
-## Core Issue
+ARA introduces a token-wise adaptive routing mechanism that dynamically determines whether each token requires expensive global attention or can be processed using a cheaper local attention pathway. This enables significant reductions in latency and FLOPs while preserving model expressiveness.
 
-Every token attends to every other token
+This repository implements:
 
-Leads to:
+- Adaptive-Router Transformer (ART): Efficient transformer with dynamic attention routing
+- Dual-Path Attention Module: Combines full and local attention paths
+- Routing Network (MLP-based): Learns importance-aware token selection
 
-High latency during inference
+## Model Overview
 
-Quadratic FLOPs growth
+Adaptive Router Attention reformulates the standard attention pipeline by introducing conditional computation at the token level.
 
-Poor scalability for long sequences
+### Key Components
 
-## Goal
+- Token Statistics Extractor
+Computes:
+    - Magnitude: ∥𝑥𝑖∥ 
+    - Variance: Var (𝑥𝑖)
+    - Context deviation: ∥xi​−μ∥
 
-Design a mechanism that:
+- Routing Network (MLP + Sigmoid)
+Produces a routing score:
+       gi​∈[0,1] 
 
-Reduces unnecessary global attention computation
+- Dual Attention Paths
+     - Full Attention (Expensive, Global Context)
+     - Local Attention (Cheap, Windowed Context)
+- Adaptive Fusion Mechanism
+      - Combines both paths dynamically per token.
+  
+## Architecture Overview
 
-Maintains model expressiveness
+1. Training Architecture (Learning Phase)
 
-Improves inference efficiency without major accuracy loss
+During training, the model does both types of attention for every token so it can learn properly.
 
-## Proposed Solution: Adaptive Router Attention
-
-We introduce a token-wise routing mechanism that dynamically decides:
-
-"Does this token really need full global attention?"
+How it works
+ - Input Embeddings: 
+      Tokens are converted into vector representations.
+ - Feature Extraction
+      The model analyzes each token (its importance, variation, and difference from others).
+- Router Module (MLP)
+      A small neural network predicts a score for each token:
+      “How important is this token?”
+- Parallel Attention
+      Full Attention: looks at all tokens (expensive but powerful)
+      Local Attention: looks at nearby tokens (cheap but limited)
+- Soft Combination
+      The model blends both outputs using the router score
+      Every token gets a mix of global + local information
 
 ![train_page-0001](https://github.com/user-attachments/assets/6cb7e90e-1619-4993-b4e6-71d055dcc94a)
+
+2. Inference Architecture (Efficient Phase)
+
+During inference, the model becomes efficient by making hard decisions.
+
+How it works
+ - Router Decision
+      For each token, the router decides:
+      Important → Full Attention
+      Not important → Local Attention
+- Single Path Execution
+      Only one attention type is computed per token
+      No blending anymore
+- Final Output
+      Tokens either use:
+           Global context (accurate but expensive)
+           Local context (fast and cheap)
 
 ![test_page-0001](https://github.com/user-attachments/assets/7d68c595-6c18-43ea-92ac-58935a2fdc2b)
 
