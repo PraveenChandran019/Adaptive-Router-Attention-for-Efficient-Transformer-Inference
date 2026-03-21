@@ -4,6 +4,7 @@
 
 Transformer models rely on full self-attention, which has: 
                           O(n2⋅d) 
+                          
 time and memory complexity.
 
 Core Issue
