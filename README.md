@@ -26,15 +26,16 @@ Maintains model expressiveness
 
 Improves inference efficiency without major accuracy loss
 
-Proposed Solution: Adaptive Router Attention
+## Proposed Solution: Adaptive Router Attention
 
 We introduce a token-wise routing mechanism that dynamically decides:
 
 "Does this token really need full global attention?"
 
+![train_page-0001](https://github.com/user-attachments/assets/6cb7e90e-1619-4993-b4e6-71d055dcc94a)
+
 ![test_page-0001](https://github.com/user-attachments/assets/7d68c595-6c18-43ea-92ac-58935a2fdc2b)
 
-![train_page-0001](https://github.com/user-attachments/assets/6cb7e90e-1619-4993-b4e6-71d055dcc94a)
 
 ## Key Idea
 
