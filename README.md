@@ -25,7 +25,7 @@ This repository implements:
 - Dual-Path Attention Module: Combines full and local attention paths
 - Routing Network (MLP-based): Learns importance-aware token selection
 
-## Model Overview
+## Proposed Model Overview
 
 Adaptive Router Attention reformulates the standard attention pipeline by introducing conditional computation at the token level.
 
@@ -47,7 +47,7 @@ Produces a routing score:
 - Adaptive Fusion Mechanism
       - Combines both paths dynamically per token.
   
-## Architecture Overview
+## Proposed Architecture Overview
 
 1. Training Architecture (Learning Phase)
 
