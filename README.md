@@ -75,6 +75,7 @@ Context deviation:
 ## Empirical Results
 
 ### Training Metrics
+<img width="2268" height="822" alt="training_metrics_table (1)" src="https://github.com/user-attachments/assets/ff939b42-55ef-4442-bf68-7eaf33ed7b1f" />
 
 ### Performance Improvements
 
