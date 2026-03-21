@@ -1,19 +1,17 @@
 # Adaptive-Router-Attention-for-Efficient-Transformer-Inference
 
-📌 Problem Statement
+## Problem Statement
 
 Transformer models rely on full self-attention, which has:
+          **Time Complexity:** O(n² · d) 
+          
+Core Issues:
 
-[
-\mathcal{O}(n^2 \cdot d)
-]
-
-❗ Core Issues
-Every token attends to every other token
-Leads to:
-High inference latency
-Quadratic FLOPs growth
-Poor scalability for long sequences
+ - Every token attends to every other token
+ - Leads to:
+   - High inference latency
+   - Quadratic FLOPs growth
+   - Poor scalability for long sequences
 
 ## Introduction
 
