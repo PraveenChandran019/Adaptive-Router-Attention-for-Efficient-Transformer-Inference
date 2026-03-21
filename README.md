@@ -1,5 +1,20 @@
 # Adaptive-Router-Attention-for-Efficient-Transformer-Inference
 
+📌 Problem Statement
+
+Transformer models rely on full self-attention, which has:
+
+[
+\mathcal{O}(n^2 \cdot d)
+]
+
+❗ Core Issues
+Every token attends to every other token
+Leads to:
+High inference latency
+Quadratic FLOPs growth
+Poor scalability for long sequences
+
 ## Introduction
 
 The Adaptive Router Attention (ARA) framework is a novel approach designed to improve the efficiency of transformer inference by reducing unnecessary global attention computations. Traditional transformer models rely on full self-attention, which scales quadratically with sequence length, making them inefficient for long-context tasks.
@@ -25,6 +40,7 @@ Computes:
     - Context deviation: ∥xi​−μ∥
 
 - Routing Network (MLP + Sigmoid)
+- 
 Produces a routing score:
        gi​∈[0,1] 
 
@@ -77,105 +93,33 @@ How it works
 ![test_page-0001](https://github.com/user-attachments/assets/7d68c595-6c18-43ea-92ac-58935a2fdc2b)
 
 
-## Key Idea
+## Results 
 
-For each token xi​ , compute a routing weight:
-               gi ​∈ [0,1]
+### Inference Latency Reduction:
+ - 7.27 ms → 4.11 ms → ~43.5% faster
+   <img width="1222" height="648" alt="inference_latency_table" src="https://github.com/user-attachments/assets/e2f491a3-5fcb-40fd-9ac6-3133b68ef593" />
 
-Then combine two attention paths:
+### Compute Efficiency (Sequence Length = 128)
 
-Outputi​=gi​⋅FullAttentioni​+(1−gi​)⋅LocalAttentioni
-
-## Mathematical Formulation
-### 1. Standard Attention:
-            Attn(Q,K,V)=Softmax(​QKT/​√d)V
-### Complexity:
-            O(n**2 d)
-### 2. Local Attention (Cheap Path):
-
-Restrict attention to a window of size 
-        LocalAttn(xi​)= ∑ j∈N(i) ​αij​Vj​
-### Complexity:
-            O(n⋅w⋅d)
+ - Full Attention FLOPs: 0.07G (70M)
+ - Router FLOPs: 5.2M
+ - Compute Reduction: 64.8M FLOPs saved
+ - Efficiency Gain: ~13.5× cheaper than full attention
    
-### 3. Router Function
+Scaling Insight:
 
-We compute routing scores using token statistics:
-
-Magnitude:
-       ∥xi​∥
-
-Variance:
-       Var(xi​)
-  
-Context deviation:
-        ∥xi​−μ∥, μ=n1​∑xi​	​
-
-### Router:
-        gi​=σ(MLP([∥xi​∥,Var(xi​),∥xi​−μ∥]))]
-
-### 4. Final Output
-        yi​=gi​⋅yifull​+(1−gi​)⋅yilocal​
-
-## Empirical Results
-
-### Training Metrics
-<img width="2268" height="822" alt="training_metrics_table (1)" src="https://github.com/user-attachments/assets/ff939b42-55ef-4442-bf68-7eaf33ed7b1f" />
-
+ - Full attention grows quadratically (O(n²))
+ - Router uses linear + selective global attention
+ - At longer sequences → massive compute savings with minimal latency growth
+   
 <img width="2385" height="915" alt="image" src="https://github.com/user-attachments/assets/569b8468-9df2-4ff8-bbcb-28b7e25e0da9" />
 
-<img width="1222" height="648" alt="inference_latency_table" src="https://github.com/user-attachments/assets/e2f491a3-5fcb-40fd-9ac6-3133b68ef593" />
+### Training Trade-offs
 
-### Performance Improvements
+- Loss: 6.17 → 7.63 (+23.7% worse)
+- Perplexity: 1028 → 1193 (+16.1% worse)
+- Accuracy: 0.179 → 0.131 (~26.8% drop)
+- FLOPs: 4.1G → 6.12G (~49% higher training cost)
 
-### 1. Inference Latency
+<img width="2268" height="822" alt="training_metrics_table (1)" src="https://github.com/user-attachments/assets/ff939b42-55ef-4442-bf68-7eaf33ed7b1f" />
 
-   Latency Reduction= 7.27−4.11 / 7.27 ≈ 43.5%
-   
-### 2. FLOPs Reduction (Scaling Perspective)
-
-At sequence length 512:
-
-Full Attention: 1.07b FLOPs
-
-Cheap Path: 21M FLOPs
-
-Reduction ≈ 68.0 %
-
-### 3. Scaling Behavior
-
-
-## Key Insights
-
-Router avoids unnecessary global attention
-
-Gains increase with sequence length
-
-Acts like a learned sparsity mechanism
-
-Trades small accuracy drop for large efficiency gains
-
-
-## Interpretation
-
-The router effectively learns:
-
-High-importance tokens → Full attention
-
-Low-importance tokens → Local attention
-
-This mimics:
-
-Sparse attention
-
-Mixture-of-experts routing
-
-Conditional computation
-
-## Limitations
-
-Slight degradation in accuracy (~26% relative drop)
-
-Training cost increases (~49% FLOPs increase)
-
-Router quality is critical
