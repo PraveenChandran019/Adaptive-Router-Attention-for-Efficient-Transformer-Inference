@@ -94,7 +94,8 @@ How it works
 
 ### Inference Latency Reduction:
  - 7.27 ms → 4.11 ms → ~43.5% faster
-   <img width="1222" height="648" alt="inference_latency_table" src="https://github.com/user-attachments/assets/e2f491a3-5fcb-40fd-9ac6-3133b68ef593" />
+   
+   <img width="2385" height="915" alt="inference_latency_table" src="https://github.com/user-attachments/assets/e2f491a3-5fcb-40fd-9ac6-3133b68ef593" />
 
 ### Compute Efficiency (Sequence Length = 128)
 
