@@ -32,6 +32,10 @@ We introduce a token-wise routing mechanism that dynamically decides:
 
 "Does this token really need full global attention?"
 
+![test_page-0001](https://github.com/user-attachments/assets/7d68c595-6c18-43ea-92ac-58935a2fdc2b)
+
+![train_page-0001](https://github.com/user-attachments/assets/6cb7e90e-1619-4993-b4e6-71d055dcc94a)
+
 ## Key Idea
 
 For each token xi​ , compute a routing weight:
@@ -76,6 +80,10 @@ Context deviation:
 
 ### Training Metrics
 <img width="2268" height="822" alt="training_metrics_table (1)" src="https://github.com/user-attachments/assets/ff939b42-55ef-4442-bf68-7eaf33ed7b1f" />
+
+<img width="2385" height="915" alt="image" src="https://github.com/user-attachments/assets/569b8468-9df2-4ff8-bbcb-28b7e25e0da9" />
+
+<img width="1222" height="648" alt="inference_latency_table" src="https://github.com/user-attachments/assets/e2f491a3-5fcb-40fd-9ac6-3133b68ef593" />
 
 ### Performance Improvements
 
