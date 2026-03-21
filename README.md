@@ -38,7 +38,6 @@ Computes:
     - Context deviation: ∥xi​−μ∥
 
 - Routing Network (MLP + Sigmoid)
-- 
 Produces a routing score:
        gi​∈[0,1] 
 
