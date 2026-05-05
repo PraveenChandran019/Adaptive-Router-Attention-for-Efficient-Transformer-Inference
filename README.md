@@ -92,17 +92,16 @@ How it works
 
 ## Results 
 
-### Inference Latency Reduction:
- - 7.27 ms → 4.11 ms → ~43.5% faster
-   
-   <img width="2385" height="915" alt="inference_latency_table" src="https://github.com/user-attachments/assets/e2f491a3-5fcb-40fd-9ac6-3133b68ef593" />
-
 ### Compute Efficiency (Sequence Length = 128)
 
  - Full Attention FLOPs: 0.07G (70M)
+ - Inference Latency: 7.27 ms → 4.11 ms → ~43.5%
  - Router FLOPs: 5.2M
  - Compute Reduction: 64.8M FLOPs saved
  - Efficiency Gain: ~13.5× cheaper than full attention
+
+   <img width="895" height="281" alt="Screenshot 2026-05-05 230615" src="https://github.com/user-attachments/assets/f6104eaa-adb3-40aa-bfb9-7cf9088d0a5c" />
+
    
 Scaling Insight:
 
@@ -110,7 +109,6 @@ Scaling Insight:
  - Router uses linear + selective global attention
  - At longer sequences → massive compute savings with minimal latency growth
    
-<img width="2385" height="915" alt="image" src="https://github.com/user-attachments/assets/569b8468-9df2-4ff8-bbcb-28b7e25e0da9" />
 
 ### Training Trade-offs
 
@@ -119,5 +117,5 @@ Scaling Insight:
 - Accuracy: 0.179 → 0.131 (~26.8% drop)
 - FLOPs: 4.1G → 6.12G (~49% higher training cost)
 
-<img width="2268" height="822" alt="training_metrics_table (1)" src="https://github.com/user-attachments/assets/ff939b42-55ef-4442-bf68-7eaf33ed7b1f" />
+<img width="1190" height="318" alt="Screenshot 2026-05-05 230605" src="https://github.com/user-attachments/assets/1d74134c-6606-4935-a8e4-a04c7ba90787" />
 
