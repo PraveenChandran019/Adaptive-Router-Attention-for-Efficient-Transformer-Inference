@@ -273,7 +273,27 @@ df = pd.DataFrame({
     "Cheap_FLOPs": fl_c
 })
 
+print("\nTRAINING METRICS TABLE\n")
+train_display = train_df.copy()
+train_display.columns = [
+    "Model",
+    "Parameters (M)",
+    "FLOPs (G)",
+    "Loss",
+    "Perplexity",
+    "Accuracy",
+    "Tokens/sec"
+]
 
-=print(train_df)
-print(inf_df)
-print(df)
+print(train_display.to_string(index=False))
+
+print("\nSCALING METRICS TABLE\n")
+scale_display = df.copy()
+scale_display.columns = [
+    "Sequence Length",
+    "Full Latency (ms)",
+    "Router Latency (ms)",
+    "Full FLOPs",
+    "Cheap FLOPs"
+]
+print(scale_display.to_string(index=False))
