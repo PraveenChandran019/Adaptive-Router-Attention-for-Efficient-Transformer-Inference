@@ -97,10 +97,10 @@ How it works
  - Full Attention FLOPs: 72M
  - Inference Latency: 7.27 ms → 4.11 ms → ~43.5%
  - Router FLOPs: 5.2M
- - Compute Reduction: 67.8M FLOPs saved
+ - Compute Reduction: 64.8M FLOPs saved
  - Efficiency Gain: ~13.5× cheaper than full attention
 
-   <img width="895" height="281" alt="Screenshot 2026-05-05 230615" src="https://github.com/user-attachments/assets/f6104eaa-adb3-40aa-bfb9-7cf9088d0a5c" />
+<img width="705" height="210" alt="image" src="https://github.com/user-attachments/assets/62674b1b-8b7e-456c-bc16-13e9a23a96ab" />
 
    
 Scaling Insight:
