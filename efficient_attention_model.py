@@ -24,6 +24,7 @@ def cheap_flops(n):
 class FullAttention(nn.Module):
     def __init__(self):
         super().__init__()
+
         self.qkv = nn.Linear(d, 3*d)
         self.out = nn.Linear(d, d)
         self.hd = d // heads
@@ -286,7 +287,7 @@ def train(model, name):
     return {
         "Model": name,
         "Params": params,
-        "FLOPs": attn_flops,
+        "Attention FLOPs": attn_flops,
         "Loss": avg_loss,
         "Perplexity": math.exp(avg_loss),
         "Accuracy": sum(accs) / len(accs),
@@ -294,22 +295,28 @@ def train(model, name):
     }
 
 
-def infer(model, name):
+def infer_attention(model, name):
     model.eval()
 
-    x = torch.randint(0, vocab, (1, seq)).to(device)
+    x = torch.randn(1, seq, d).to(device)
 
-    start = time.time()
+    total_latency = 0
 
-    for _ in range(100):
-        with torch.no_grad():
-            model(x)
+    for block in model.blocks:
 
-    latency = (time.time() - start) / 100
+        start = time.time()
+
+        for _ in range(100):
+            with torch.no_grad():
+                block.attn(x)
+
+        latency = (time.time() - start) / 100
+
+        total_latency += latency
 
     return {
         "Model": name,
-        "Latency(ms)": latency * 1000
+        "Attention Latency(ms)": total_latency * 1000
     }
 
 
@@ -323,8 +330,8 @@ train_df = pd.DataFrame([
 ])
 
 inf_df = pd.DataFrame([
-    infer(base, "Baseline"),
-    infer(router, "Router")
+    infer_attention(base, "Baseline"),
+    infer_attention(router, "Router")
 ])
 
 sizes = [64, 128, 256, 512]
@@ -332,66 +339,57 @@ sizes = [64, 128, 256, 512]
 lat_f, lat_r, fl_f, fl_c = [], [], [], []
 
 for s in sizes:
-    x = torch.randint(0, vocab, (1, s)).to(device)
+
+    x = torch.randn(1, s, d).to(device)
 
     mf = Model(False).to(device)
     mr = Model(True).to(device)
 
-    start = time.time()
+    full_time = 0
+    router_time = 0
 
-    for _ in range(50):
-        mf(x)
+    for block in mf.blocks:
 
-    lat_f.append((time.time() - start) / 50 * 1000)
+        start = time.time()
 
-    start = time.time()
+        for _ in range(50):
+            with torch.no_grad():
+                block.attn(x)
 
-    for _ in range(50):
-        mr(x)
+        full_time += (time.time() - start) / 50 * 1000
 
-    lat_r.append((time.time() - start) / 50 * 1000)
+    for block in mr.blocks:
+
+        start = time.time()
+
+        for _ in range(50):
+            with torch.no_grad():
+                block.attn(x)
+
+        router_time += (time.time() - start) / 50 * 1000
+
+    lat_f.append(full_time)
+    lat_r.append(router_time)
 
     fl_f.append(full_flops(s))
     fl_c.append(cheap_flops(s))
 
 df = pd.DataFrame({
     "Seq": sizes,
-    "Full_Latency": lat_f,
-    "Router_Latency": lat_r,
-    "Full_FLOPs": fl_f,
-    "Cheap_FLOPs": fl_c
+    "Full_Attention_Latency": lat_f,
+    "Router_Attention_Latency": lat_r,
+    "Full_Attention_FLOPs": fl_f,
+    "Cheap_Attention_FLOPs": fl_c
 })
 
 print("\nTRAINING METRICS TABLE\n")
 
-train_display = train_df.copy()
+print(train_df.to_string(index=False))
 
-train_display.columns = [
-    "Model",
-    "Parameters (M)",
-    "Attention FLOPs",
-    "Loss",
-    "Perplexity",
-    "Accuracy",
-    "Tokens/sec"
-]
-
-print(train_display.to_string(index=False))
-
-print("\nINFERENCE LATENCY TABLE\n")
+print("\nATTENTION LATENCY TABLE\n")
 
 print(inf_df.to_string(index=False))
 
-print("\nSCALING METRICS TABLE\n")
+print("\nATTENTION SCALING TABLE\n")
 
-scale_display = df.copy()
-
-scale_display.columns = [
-    "Sequence Length",
-    "Full Latency (ms)",
-    "Router Latency (ms)",
-    "Full Attention FLOPs",
-    "Cheap Attention FLOPs"
-]
-
-print(scale_display.to_string(index=False))
+print(df.to_string(index=False))
