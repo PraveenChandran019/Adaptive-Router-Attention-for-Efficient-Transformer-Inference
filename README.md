@@ -113,9 +113,8 @@ Scaling Insight:
 ### Training Trade-offs
 
 - Loss: 6.17 → 7.63 (+23.7% worse)
-- Perplexity: 1028 → 1193 (+16.1% worse)
 - Accuracy: 0.179 → 0.131 (~26.8% drop)
 - FLOPs: 4.1G → 6.12G (~49% higher training cost)
 
-<img width="1190" height="318" alt="Screenshot 2026-05-05 230605" src="https://github.com/user-attachments/assets/1d74134c-6606-4935-a8e4-a04c7ba90787" />
+<img width="732" height="179" alt="image" src="https://github.com/user-attachments/assets/e01abec5-2df9-4e5e-873b-25e0e67b5886" />
 
