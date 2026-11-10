@@ -114,7 +114,7 @@ Scaling Insight:
 
 - Loss: 6.17 → 7.63 (+23.7% worse)
 - Accuracy: 0.179 → 0.131 (~26.8% drop)
-- FLOPs: 4.1G → 6.12G (~49% higher training cost)
+- FLOPs: 4.1G → 6.12G (~49% higher training cost).
 
 <img width="732" height="179" alt="image" src="https://github.com/user-attachments/assets/e01abec5-2df9-4e5e-873b-25e0e67b5886" />
 
